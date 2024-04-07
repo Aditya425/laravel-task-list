@@ -3,20 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Repositories\TaskRepository;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    public function __construct()
+    protected $tasks;
+    public function __construct(TaskRepository $tasks)
     {
         $this->middleware('auth');
+        $this->tasks = $tasks;
+
     }
 
     public function index(Request $request)
-    {
-        $tasks = Task::where('user_id', $request->user()->id);
-        
-        return view('tasks.index');
+    {   
+        return view('tasks.index', [
+            'tasks' => $this->tasks->forUser($request->user())
+        ]);
     }
 
     public function store(Request $request)
